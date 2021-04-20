@@ -5,7 +5,7 @@ import turtle
 
 
 
-
+# definite integration
 def integrate(a, b, f, dx):
     # return np.sum(f(np.arange(a, b, dx)) * dx)
 
@@ -17,8 +17,7 @@ def integrate(a, b, f, dx):
 
 
 
-
-
+# calculates complex coefficients for each term
 def compute_constant(n, f_vals):
     # n_t = f(t) e^(n2πit) 
     n_t = lambda t: f_vals[int(t * (len(f_vals) - 1))] * np.exp(n * 2j * np.pi * t)
@@ -109,9 +108,6 @@ class Canvas():
 
                 self.t.goto(x, y)
                 self.t.down()
-
-
-
 
 
 
