@@ -31,7 +31,6 @@ class Canvas():
         self.t = turtle.Turtle(visible = False)
         self.canvas = turtle.getcanvas()
         self.screen = turtle.Screen()
-        turtle.hideturtle()
 
         
         self.WIDTH, self.HEIGHT = 800, 800
@@ -43,6 +42,9 @@ class Canvas():
         turtle.pencolor('black')
         turtle.tracer(0)
         self.t.speed(0)
+
+        turtle.hideturtle()
+        self.t.hideturtle()
 
         self.step = 0.001
 
@@ -74,8 +76,10 @@ class Canvas():
 
         self.t.goto(self.function[0])
 
+        # convert coordinate points to complex numbers
         self.function = [a + b * 1j for a, b in self.function]
 
+        # compute and draw the fourier series
         self.draw_fourier_series()
 
 
@@ -90,24 +94,37 @@ class Canvas():
             self.constants[n] = compute_constant(n, self.function)
 
             
-        self.f = lambda t: sum([c * np.exp(n * 2j * np.pi * t) for n, c in self.constants.items()])
+        # self.f = lambda t: sum([c * np.exp(n * 2j * np.pi * t) for n, c in self.constants.items()])
+        self.f = lambda t: [c * np.exp(n * 2j * np.pi * t) for n, c in self.constants.items()]
 
     def draw_fourier_series(self):
         n = 5
         self.compute_fourier_series(-n, n)
 
         self.t.up()
-        turtle.tracer(10)
+        turtle.tracer(50)
         self.t.pencolor('red')
 
-        # repeat animation three times
-        for i in range(3):
+        # trace the computed fourier series 10 times while rendering the circles
+        for i in range(10):
             for t in np.arange(0, 1 + self.step, self.step):
-                val = self.f(t)
-                x, y = val.real, val.imag
 
-                self.t.goto(x, y)
-                self.t.down()
+                values = self.f(t)
+                self.t.up()
+                self.t.goto(0, 0)
+
+                # for vector in values:
+                for i in [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5][::-1]: # very janky, hardcoded fix
+                    curr_x, curr_y = self.t.pos()
+                    vector = values[i]
+
+                    x, y = vector.real, vector.imag
+                    self.t.down()
+                    self.t.goto(curr_x + x, curr_y + y)
+
+                self.t.clear()
+
+
 
 
 
