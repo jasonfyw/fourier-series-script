@@ -17,6 +17,8 @@ class Canvas():
         self.running = False
         self.dragging = False
 
+        self.n = 20
+
         self.start()
 
     def centre_coords(self, x, y):
@@ -48,6 +50,8 @@ class Canvas():
                 self.dragging = False
                 self.inputting_function = False
 
+                self.f = compute_fourier_series(self.n, generate_function(self.function_points))
+
         if event.type == pygame.MOUSEMOTION:
             if self.dragging and self.inputting_function:
                 x, y = pygame.mouse.get_pos()
@@ -61,22 +65,23 @@ class Canvas():
                 self.prev_pos = (x, y)
 
 
-    def draw_fourier_series(self, n):
-        f = compute_fourier_series(n, generate_function(self.function_points))
+    def draw_frame(self, t, step):
+        next_t = t + step if t != 1 else 0
 
+        z1 = self.f(t)
+        x1, y1 = z1.real, z1.imag
 
-        step = 0.001
+        z2 = self.f(next_t)
+        x2, y2 = z2.real, z2.imag
 
-        z0 = f(0)
-        x1, y1 = z0.real, z0.imag
-
-        for t in np.arange(step, 1 + step, step):
-            z = f(t)
-            x2, y2 = z.real, z.imag
-
-            pygame.draw.line(self.window, (255, 0, 0), self.centre_coords(x1, y1), self.centre_coords(x2, y2), 1)
-
-            x1, y1 = x2, y2
+        pygame.draw.line(
+            self.window,
+            (255, 0, 0),
+            self.centre_coords(x1, y1),
+            self.centre_coords(x2, y2),
+            1
+        )
+        return next_t
 
     
     def start(self):
@@ -84,14 +89,16 @@ class Canvas():
         self.inputting_function = True
 
         self.function_points = []
+        
+        t = 0
+        step = 0.001
 
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
             
             if not self.inputting_function:
-                self.draw_fourier_series(20)
-
+                t = self.draw_frame(t, step)
 
             pygame.display.flip()
 
