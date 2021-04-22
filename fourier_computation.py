@@ -26,4 +26,4 @@ def compute_fourier_series(n_total, f):
     for n in range(int(-n_total / 2), int(n_total / 2) + 1):
         constants[n] = compute_constant(n, f)
 
-    return lambda t: sum([c * np.exp(n * 2j * np.pi * t) for n, c in constants.items()])
+    return lambda t: [c * np.exp(n * 2j * np.pi * t) for n, c in constants.items()]
