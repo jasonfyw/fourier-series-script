@@ -64,14 +64,38 @@ class Canvas():
 
                 self.prev_pos = (x, y)
 
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                self.running = False
+                pygame.quit()
+                sys.exit()
+
+
+    def draw_raw_function(self):
+        x1, y1 = self.function_points[0].real, self.function_points[0].imag
+        points = self.function_points[1:] + [self.function_points[0]]
+        for z in points:
+            x2, y2 = z.real, z.imag
+            pygame.draw.line(
+                self.window, 
+                (255, 255, 255), 
+                self.centre_coords(x1, y1), 
+                self.centre_coords(x2, y2), 
+                2
+            )
+            x1, y1 = x2, y2
+
 
     def draw_frame(self, t, step):
+        self.draw_raw_function()
+
         next_t = t + step if t != 1 else 0
 
-        z1 = self.f(t)
+        f1 = self.f(t)
+        z1 = sum(f1)
         x1, y1 = z1.real, z1.imag
 
-        z2 = self.f(next_t)
+        z2 = sum(self.f(next_t))
         x2, y2 = z2.real, z2.imag
 
         pygame.draw.line(
@@ -81,6 +105,22 @@ class Canvas():
             self.centre_coords(x2, y2),
             1
         )
+
+        lx1, ly1 = 0, 0
+        for i in [((-1) ** (n + 1)) * n // 2 for n in range(self.n, 0, -1)]:
+            vector = f1[i]
+            lx2, ly2 = vector.real + lx1, vector.imag + ly1
+
+            pygame.draw.line(
+                self.window, 
+                (150, 150, 150), 
+                self.centre_coords(lx1, ly1), 
+                self.centre_coords(lx2, ly2), 
+                1
+            )
+
+            lx1, ly1 = lx2, ly2
+
         return next_t
 
     
@@ -98,6 +138,7 @@ class Canvas():
                 self.handle_event(event)
             
             if not self.inputting_function:
+                self.window.fill((0, 0, 0))
                 t = self.draw_frame(t, step)
 
             pygame.display.flip()
