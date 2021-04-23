@@ -17,7 +17,7 @@ class Canvas():
         self.running = False
         self.dragging = False
 
-        self.n = 20
+        self.n = 10
 
         self.start()
 
@@ -52,6 +52,8 @@ class Canvas():
 
                 self.f = compute_fourier_series(self.n, generate_function(self.function_points))
 
+                self.fourier_points = []
+
         if event.type == pygame.MOUSEMOTION:
             if self.dragging and self.inputting_function:
                 x, y = pygame.mouse.get_pos()
@@ -71,40 +73,33 @@ class Canvas():
                 sys.exit()
 
 
-    def draw_raw_function(self):
-        x1, y1 = self.function_points[0].real, self.function_points[0].imag
-        points = self.function_points[1:] + [self.function_points[0]]
+    def plot_points(self, points, colour, width, connect_ends = False):
+        x1, y1 = points[0].real, points[0].imag
+        points = points[1:] if not connect_ends else points[1:] + [points[0]]
         for z in points:
             x2, y2 = z.real, z.imag
             pygame.draw.line(
                 self.window, 
-                (255, 255, 255), 
+                colour, 
                 self.centre_coords(x1, y1), 
                 self.centre_coords(x2, y2), 
-                2
+                width
             )
             x1, y1 = x2, y2
 
 
     def draw_frame(self, t, step):
-        self.draw_raw_function()
+        self.plot_points(self.function_points, (255, 255, 255), 2, True)
 
         next_t = t + step if t != 1 else 0
 
         f1 = self.f(t)
         z1 = sum(f1)
-        x1, y1 = z1.real, z1.imag
-
         z2 = sum(self.f(next_t))
-        x2, y2 = z2.real, z2.imag
 
-        pygame.draw.line(
-            self.window,
-            (255, 0, 0),
-            self.centre_coords(x1, y1),
-            self.centre_coords(x2, y2),
-            1
-        )
+        self.fourier_points += [z1, z2]
+
+        self.plot_points(self.fourier_points, (255, 0, 0), 1)
 
         lx1, ly1 = 0, 0
         for i in [((-1) ** (n + 1)) * n // 2 for n in range(self.n, 0, -1)]:
