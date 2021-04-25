@@ -27,4 +27,6 @@ def compute_fourier_series(n_total, f):
     for n in range(int(-n_total / 2), int(n_total / 2) + n_total % 2):
         constants[n] = compute_constant(n, f)
 
+    # return unsummed Fourier series
+    # kept unsummed so that the individual complex numbers can be individually rendered
     return lambda t: [c * np.exp(n * 2j * np.pi * t) for n, c in constants.items()]
