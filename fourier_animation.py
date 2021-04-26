@@ -15,10 +15,12 @@ class Canvas():
         self.window = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('Fourier series animation')
 
+        # flags used during runtime
         self.running = False
         self.dragging = False
 
         self.draw_circles = True
+        self.add_to_fourier_points = True
 
         # determines number of terms in the Fourier series
         self.n = 20
@@ -117,7 +119,14 @@ class Canvas():
         self.plot_points(self.function_points, (255, 255, 255), 2, True)
 
         # calculates the next value of t to be used; overflow to 0 if t ≥ 1
-        next_t = t + step if t != 1 else 0
+        if t != 1:
+            next_t = t + step
+        else:
+            next_t = 0
+            # stop adding points once one full cycle has been completed 
+            # avoids redundantly rendering points
+            self.add_to_fourier_points = False
+
 
         # get the unsummed Fourier series at t and t+step
         f1 = self.f(t)
@@ -125,7 +134,7 @@ class Canvas():
         z2 = sum(self.f(next_t))
 
         # add the new point to the collection of points
-        self.fourier_points += [z1, z2]
+        if self.add_to_fourier_points: self.fourier_points += [z1]
         # plot all the points generated in the Fourier series
         self.plot_points(self.fourier_points, (255, 0, 0), 1)
 
