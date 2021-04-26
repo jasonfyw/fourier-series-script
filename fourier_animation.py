@@ -18,6 +18,8 @@ class Canvas():
         self.running = False
         self.dragging = False
 
+        self.draw_circles = True
+
         # determines number of terms in the Fourier series
         self.n = 20
 
@@ -82,6 +84,8 @@ class Canvas():
                 self.running = False
                 pygame.quit()
                 sys.exit()
+            elif event.key == pygame.K_c:
+                self.draw_circles = not self.draw_circles
 
 
     """
@@ -147,6 +151,16 @@ class Canvas():
                 self.centre_coords(lx2, ly2), 
                 1
             )
+
+            if self.draw_circles:
+                r = int(np.hypot(lx2-lx1, ly2-ly1))
+                pygame.draw.circle(
+                    self.window, 
+                    (80, 80, 80), 
+                    (int(lx1 + self.width / 2), int(-ly1 + self.height / 2)),
+                    r,
+                    0 if 1 >= r else 1
+                )
 
             lx1, ly1 = lx2, ly2
 
